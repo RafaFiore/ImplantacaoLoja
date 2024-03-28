@@ -1,10 +1,12 @@
 import email
 import imaplib
 import json
+import html_to_json
 import os
 from dotenv import load_dotenv
 import logger
 from email.mime.text import MIMEText
+import html
 
 class EmailInfo:
     def __init__(self):
@@ -46,7 +48,7 @@ class EmailInfo:
                             if part.get_content_maintype() == "multipart":
                                 continue
                             try:
-                                body = part.get_payload()
+                                body = part.get_payload(decode=True).decode()
                             except RuntimeError as err:
                                 print(err)
                                 exit()
@@ -68,7 +70,7 @@ class EmailInfo:
 
         except RuntimeError as err:
             self.log.error('error.log', err)
-        conteudo_json = json.loads(conteudo)
+        conteudo_json = html_to_json.convert(body)
         return conteudo_json
 
     def search_forms(self):
@@ -80,10 +82,11 @@ class EmailInfo:
                 n = 1
                 messages = int(messages[0].split()[-1])
                 for num in range(messages, messages - n, -1):
-                    self.mail_check(num, conn)
+                    form_response_json = self.mail_check(num, conn)
                 # conn.expunge()
                 conn.close()
                 conn.logout()
+                return form_response_json
             else:
                 exit()
         except RuntimeError as err:

@@ -1,4 +1,5 @@
 import EmailInfo
+from nested_lookup import nested_lookup
 
 
 class Implantacao:
@@ -6,7 +7,9 @@ class Implantacao:
         self.email_obj = EmailInfo.EmailInfo()
 
     def get_form_content(self):
-        self.email_obj.search_forms()
+        form_response = self.email_obj.search_forms()
+        values = nested_lookup('_values', form_response)[0]
+        return values
 
 
 if __name__ == "__main__":
