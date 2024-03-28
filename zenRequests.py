@@ -35,6 +35,7 @@ class ZenAPI:
         self.__users = 'users.json?page[size]=100'
         self.__search_users = 'users/search?query='
         self.__create_many_users = 'users/create_many'
+        self.__search = 'search.json?query='
         self.__instances = {
             "br": {
                 "url": "https://hostgatorbr.zendesk.com/api/v2/",
@@ -52,7 +53,7 @@ class ZenAPI:
 
         self.__new_urls = {
             "br": "https://hgsandboxoficial.zendesk.com/api/v2/",
-            "dloja": "https://atendimentohgbrasil.zendesk.com/api/v2/"
+            "dloja": "https://atendimentohgbrasil1704801360.zendesk.com/api/v2/"
         }
 
         self.__subdomains = {
@@ -122,6 +123,10 @@ class ZenAPI:
     @property
     def create_many_users(self):
         return self.__create_many_users
+
+    @property
+    def search(self):
+        return self.__search
 
     def get_request(self, url, new_instance):
         log = logger.Logger
