@@ -36,6 +36,7 @@ class ZenAPI:
         self.__search_users = 'users/search?query='
         self.__create_many_users = 'users/create_many'
         self.__search = 'search.json?query='
+        self.__create_tickets = 'tickets.json?async=true'
         self.__instances = {
             "br": {
                 "url": "https://hostgatorbr.zendesk.com/api/v2/",
@@ -128,6 +129,10 @@ class ZenAPI:
     def search(self):
         return self.__search
 
+    @property
+    def create_tickets(self):
+        return self.__create_tickets
+
     def get_request(self, url, new_instance):
         log = logger.Logger
         if new_instance:
@@ -176,7 +181,7 @@ class ZenAPI:
                 log.info('debug.log', f'HTTP 429 - Waiting {seconds_to_wait} seconds to retry')
                 time.sleep(seconds_to_wait)
                 return self.post_request(payload, endpoint)
-            elif request.status_code == 201 or request.status_code == 200:
+            elif request.status_code == 201 or request.status_code == 200 or request.status_code == 202:
                 return request.json()
             elif request.status_code == 503:
                 return self.post_request(payload, endpoint)

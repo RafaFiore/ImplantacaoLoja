@@ -34,7 +34,7 @@ class Implantacao:
     def check_zd_user(self, cst_email):
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search_users + cst_email
         response = self.zenAPI.get_request(url, new_instance=True)
-        user = response['user']
+        user = response['users']
         return user
 
     def create_zd_user(self, cst_email, nome):
@@ -50,11 +50,35 @@ class Implantacao:
         response = self.zenAPI.post_request(payload, endpoint)
         return response
 
-    def get_template(self):
-        pass
+    def zd_template(self):
+        ticket_subject = 'Parabéns por escolher a Loja HostGator - Solicitação de Informações'
+        with open('templates\\ticket_template', mode='r', encoding='utf8') as ticket_template:
+            zd_comment = ticket_template.read()
+        return ticket_subject, zd_comment
 
     def create_ticket(self, cst_email):
-        pass
+        subject, comment = self.zd_template()
+        submitter_id = 24966456979859 # TROCAR PARA PROD
+        group_id = 24966089236755 # TROCAR PARA PROD
+        brand_id = 26558151214099 # TROCAR PARA PROD
+        payload = {
+            "ticket": {
+                "subject": f"{subject}",
+                "comment": {
+                    "body": f"{comment}"
+                },
+                "submitter_id": submitter_id,
+                "requester": {
+                    "email": f"{cst_email}"
+                },
+                "group_id": group_id,
+                "is_public": "true",
+                "status": "pending",
+                "brand_id": brand_id
+            }
+        }
+        response = self.zenAPI.post_request(payload, self.zenAPI.create_tickets)
+        return response
 
     def process_implantacao(self):
         log = logger.Logger()
@@ -69,7 +93,7 @@ class Implantacao:
             rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
             print(rd_lead_url)
             print(cst_email)
-            ticket_created = self.check_tickets(123)
+            ticket_created = self.check_tickets(rd_ticket_id)
             if ticket_created:
                 print(f'Implantação já encaminhada: {rd_ticket_id}')
                 continue
@@ -80,6 +104,8 @@ class Implantacao:
                 else:
                     new_user = self.create_zd_user(cst_email, cst_name)
                     log.info('debug.log', f'New Zendesk user created - {new_user["user"]["url"]}')
+            ticket = self.create_ticket(cst_email)
+            print(ticket)
 
 
 if __name__ == "__main__":
