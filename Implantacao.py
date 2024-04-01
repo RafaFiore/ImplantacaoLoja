@@ -21,7 +21,9 @@ class Implantacao:
         response = self.zenAPI.get_request(url, new_instance=True)
         result = response['results']
         for i in result:
+            print(result)
             ticket_id = i['id']
+            ticket_date = i['created_at']
             subject = i['subject']
             cst_email = subject.split('-')[1].strip()
             cst_name = subject.split('-')[2].strip()
