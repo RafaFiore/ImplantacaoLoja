@@ -1,5 +1,6 @@
 import EmailInfo
 from nested_lookup import nested_lookup
+import re
 
 import zenRequests
 
@@ -16,6 +17,7 @@ class Implantacao:
         return values
 
     def search_rd_tickets(self):
+        rd_lead_pattern = 'https://app.rdstation.com.br/leads/public/.*\\/s'
         query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Implanta%C3%A7%C3%A3o%20Ecommerce'
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search + query
         response = self.zenAPI.get_request(url, new_instance=True)
@@ -27,6 +29,8 @@ class Implantacao:
             subject = i['subject']
             cst_email = subject.split('-')[1].strip()
             cst_name = subject.split('-')[2].strip()
+            rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
+            print(rd_lead_url)
             print(cst_email)
 
 
