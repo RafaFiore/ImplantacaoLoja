@@ -41,4 +41,33 @@ class Database:
         finally:
             cursor.close()
             conn.close()
-            
+
+    def insert_ticket(self, values):
+        log = logger.Logger()
+        conn, cursor = self.init_conn()
+        query = ("INSERT INTO implantacoes "
+                 "(ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, status) "
+                 "VALUES (%s, %s, %s, %s, %s, %s, %s)")
+        try:
+            cursor.executemany(query, values)
+        except mysql.connector.Error as err:
+            log.error('db_error.log', err)
+        finally:
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+    def update_ticket(self, ticket_id):
+        log = logger.Logger()
+        conn, cursor = self.init_conn()
+        query = ("UPDATE implantacoes "
+                 "SET status = 'finalizado' "
+                 "WHERE ticket_id = %s")
+        try:
+            cursor.execute(query, (ticket_id,))
+        except mysql.connector.Error as err:
+            log.error('db_error.log', err)
+        finally:
+            conn.commit()
+            cursor.close()
+            conn.close()
