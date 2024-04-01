@@ -20,14 +20,24 @@ class Implantacao:
         return values
 
     def search_rd_tickets(self):
-        rd_lead_pattern = 'https://app.rdstation.com.br/leads/public/.*\\/s'
         query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Implanta%C3%A7%C3%A3o%20Ecommerce'
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search + query
         response = self.zenAPI.get_request(url, new_instance=True)
         result = response['results']
-        for i in result:
-            print(result)
-            ticket_id = i['id']
+        return result
+
+    def check_tickets(self, rd_ticket_id):
+        ticket_created = self.db_conn.select_rd_tickets(rd_ticket_id)
+        return ticket_created
+
+    def check_zd_user(self, cst_email):
+        pass
+
+    def process_implantacao(self):
+        rd_tickets = self.search_rd_tickets()
+        rd_lead_pattern = 'https://app.rdstation.com.br/leads/public/.*\\/s'
+        for i in rd_tickets:
+            rd_ticket_id = i['id']
             ticket_date = i['created_at']
             subject = i['subject']
             cst_email = subject.split('-')[1].strip()
@@ -35,12 +45,14 @@ class Implantacao:
             rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
             print(rd_lead_url)
             print(cst_email)
-
-    def check_tickets(self, rd_ticket_id):
-        ticket_created = self.db_conn.select_rd_tickets(rd_ticket_id)
-        return ticket_created
+            ticket_created = self.check_tickets(123)
+            if ticket_created:
+                print(f'Implantação já encaminhada: {rd_ticket_id}')
+                continue
+            else:
+                self.check_zd_user(cst_email)
 
 
 if __name__ == "__main__":
     implant = Implantacao('dloja')
-    implant.search_rd_tickets()
+    implant.process_implantacao()
