@@ -3,6 +3,7 @@ from nested_lookup import nested_lookup
 import DB
 import re
 
+import logger
 import zenRequests
 
 
@@ -31,9 +32,32 @@ class Implantacao:
         return ticket_created
 
     def check_zd_user(self, cst_email):
+        url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search_users + cst_email
+        response = self.zenAPI.get_request(url, new_instance=True)
+        user = response['user']
+        return user
+
+    def create_zd_user(self, cst_email, nome):
+        endpoint = 'users'
+        payload = {
+            "user": {
+                "email": f"{cst_email}",
+                "name": f"{nome}",
+                "role": "end-user",
+                "verified": "true"
+            }
+        }
+        response = self.zenAPI.post_request(payload, endpoint)
+        return response
+
+    def get_template(self):
+        pass
+
+    def create_ticket(self, cst_email):
         pass
 
     def process_implantacao(self):
+        log = logger.Logger()
         rd_tickets = self.search_rd_tickets()
         rd_lead_pattern = 'https://app.rdstation.com.br/leads/public/.*\\/s'
         for i in rd_tickets:
@@ -50,7 +74,12 @@ class Implantacao:
                 print(f'Implantação já encaminhada: {rd_ticket_id}')
                 continue
             else:
-                self.check_zd_user(cst_email)
+                user_exists = self.check_zd_user(cst_email)
+                if user_exists:
+                    print(f'Usuário {cst_email} já existe, não é necessário criar')
+                else:
+                    new_user = self.create_zd_user(cst_email, cst_name)
+                    log.info('debug.log', f'New Zendesk user created - {new_user["user"]["url"]}')
 
 
 if __name__ == "__main__":
