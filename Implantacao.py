@@ -165,7 +165,11 @@ class Implantacao:
             print('Sem ticket')
         self.add_to_db(self.db_values)
 
+    def process_form_answers(self):
+        form_answer = self.get_form_content()
+        print(form_answer)
+
 
 if __name__ == "__main__":
     implant = Implantacao('dloja')
-    implant.process_implantacao()
+    implant.process_form_answers()
