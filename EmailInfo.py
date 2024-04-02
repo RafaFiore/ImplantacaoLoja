@@ -8,6 +8,7 @@ import logger
 from email.mime.text import MIMEText
 import html
 
+
 class EmailInfo:
     def __init__(self):
         load_dotenv()
@@ -78,15 +79,17 @@ class EmailInfo:
         try:
             status, messages = conn.search(None, f'(OR (FROM "{self.__sender}" ) (FROM "{self.__sender}"))')
             if messages[0]:
-                print(f'num msgs: {int(messages[0].split()[-1])}')
+                num_msgs = int(messages[0].split()[-1])
+                print(f'num msgs: {num_msgs}')
                 n = 1
                 messages = int(messages[0].split()[-1])
                 for num in range(messages, messages - n, -1):
                     form_response_json = self.mail_check(num, conn)
+                    num_msgs -= 1
                 # conn.expunge()
                 conn.close()
                 conn.logout()
-                return form_response_json
+                return form_response_json, num_msgs
             else:
                 exit()
         except RuntimeError as err:
