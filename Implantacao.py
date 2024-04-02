@@ -1,12 +1,12 @@
 import time
-
 import EmailInfo
 from nested_lookup import nested_lookup
 import DB
 import re
-
 import logger
 import zenRequests
+from datetime import datetime
+from dateutil import parser
 
 
 class Implantacao:
@@ -16,6 +16,7 @@ class Implantacao:
         self.zenAPI = zenRequests.ZenAPI('dloja')
         self.db_conn = DB.Database()
         self.zenAPI = zenRequests.ZenAPI(self.brand)
+        self.db_values = []
 
     def get_form_content(self):
         form_response = self.email_obj.search_forms()
@@ -98,6 +99,20 @@ class Implantacao:
         response = self.zenAPI.put_request(payload, url)
         return response
 
+    def ticket_date_parser(self, ticket_date):
+        new_ticket_date = parser.parse(ticket_date)
+        new_ticket_date = new_ticket_date.astimezone(tz=None).replace(tzinfo=None)
+        return new_ticket_date
+
+    def add_db_values(self, ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, status):
+        rd_ticket_date_br = self.ticket_date_parser(rd_ticket_date)
+        values_tuple = (ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date_br, ticket_date, status)
+        self.db_values.append(values_tuple)
+
+    def add_to_db(self, values):
+        if values:
+            self.db_conn.insert_ticket(values)
+
     def process_implantacao(self):
         log = logger.Logger()
         rd_tickets = self.search_rd_tickets()
@@ -137,14 +152,18 @@ class Implantacao:
                 """
                 if job_status == 'completed':
                     cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    ticket_date = datetime.now().replace(microsecond=0)
                     print(cst_ticket_response)
                 else:
                     print('Aguardando criação do ticket')
                     time.sleep(15)
                     cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    ticket_date = datetime.now().replace(microsecond=0)
                     print(cst_ticket_response)
+                self.add_db_values(ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, 'pending')
         else:
             print('Sem ticket')
+        self.add_to_db(self.db_values)
 
 
 if __name__ == "__main__":
