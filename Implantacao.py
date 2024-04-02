@@ -19,9 +19,9 @@ class Implantacao:
         self.db_values = []
 
     def get_form_content(self):
-        form_response = self.email_obj.search_forms()
+        form_response, num_msgs = self.email_obj.search_forms()
         values = nested_lookup('_values', form_response)[0]
-        return values
+        return values, num_msgs
 
     def search_rd_tickets(self):
         query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Implanta%C3%A7%C3%A3o%20Ecommerce'
@@ -166,8 +166,22 @@ class Implantacao:
         self.add_to_db(self.db_values)
 
     def process_form_answers(self):
-        form_answer = self.get_form_content()
-        print(form_answer)
+        num_msgs = 1
+        while num_msgs > 0:
+            form_answer, num_msgs = self.get_form_content()
+            cst_email = form_answer[1]
+            form_link = form_answer[2]
+            ticket_exists = self.db_conn.select_customers(cst_email)
+            if ticket_exists:
+                ticket_id = str(ticket_exists[0])
+                comment = f"""
+                Prosseguir com implatanção.
+                Link para respostas do forms do cliente: {form_link} 
+                """
+                response = self.update_tickets(ticket_id, comment, status='open')
+                self.db_conn.update_ticket(ticket_id)
+            else:
+                print('Ticket não encontrado com o email do cliente ou ticket já respondido')
 
 
 if __name__ == "__main__":
