@@ -20,11 +20,13 @@ class Implantacao:
         self.db_values = []
         self.teams_notify = teamsNotify.TeamsNotifications()
 
+    # Obter conteúdo da resposta do forms
     def get_form_content(self):
         form_response, num_msgs = self.email_obj.search_forms()
         values = nested_lookup('_values', form_response)[0]
         return values, num_msgs
 
+    # Procurar no Zendesk os tickets em aberto da RD
     def search_rd_tickets(self):
         query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Implanta%C3%A7%C3%A3o%20Ecommerce'
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search + query
@@ -32,16 +34,19 @@ class Implantacao:
         result = response['results']
         return result
 
+    # Verificar se já existe um ticket de implatanção em aberto
     def check_tickets(self, rd_ticket_id):
         ticket_created = self.db_conn.select_rd_tickets(rd_ticket_id)
         return ticket_created
 
+    # Verificar se o cliente já tem cadastro no Zendesk
     def check_zd_user(self, cst_email):
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.search_users + cst_email
         response = self.zenAPI.get_request(url, new_instance=True)
         user = response['users']
         return user
 
+    # Criar usuário no Zendesk
     def create_zd_user(self, cst_email, nome):
         endpoint = 'users'
         payload = {
@@ -55,12 +60,14 @@ class Implantacao:
         response = self.zenAPI.post_request(payload, endpoint)
         return response
 
+    # Definir o assunto e comentários do ticket
     def zd_template(self):
         ticket_subject = 'Parabéns por escolher a Loja HostGator - Solicitação de Informações'
         with open('templates\\ticket_template', mode='r', encoding='utf8') as ticket_template:
             zd_comment = ticket_template.read()
         return ticket_subject, zd_comment
 
+    # Criar ticket na Zendesk
     def create_ticket(self, cst_email):
         subject, comment = self.zd_template()
         submitter_id = 24966456979859 # TROCAR PARA PROD
@@ -85,6 +92,7 @@ class Implantacao:
         response = self.zenAPI.post_request(payload, self.zenAPI.create_tickets)
         return response
 
+    # Atualizar tickets na Zendesk
     def update_tickets(self, ticket_id, comment, status):
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.ticekts + ticket_id
         submitter_id = 24966456979859  # TROCAR PARA PROD
@@ -101,20 +109,24 @@ class Implantacao:
         response = self.zenAPI.put_request(payload, url)
         return response
 
+    # Ajustar a data do ticket para BR
     def ticket_date_parser(self, ticket_date):
         new_ticket_date = parser.parse(ticket_date)
         new_ticket_date = new_ticket_date.astimezone(tz=None).replace(tzinfo=None)
         return new_ticket_date
 
+    # Criar lista de tupla com os valores para inserir no banco de dados
     def add_db_values(self, ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, status):
         rd_ticket_date_br = self.ticket_date_parser(rd_ticket_date)
         values_tuple = (ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date_br, ticket_date, status)
         self.db_values.append(values_tuple)
 
+    # Adicionar os dados no banco de dados
     def add_to_db(self, values):
         if values:
             self.db_conn.insert_ticket(values)
 
+    # Função principal de processamento que envolvem tickets
     def process_implantacao(self):
         log = logger.Logger()
         rd_tickets = self.search_rd_tickets()
@@ -168,6 +180,7 @@ class Implantacao:
             exit()
         self.add_to_db(self.db_values)
 
+    # Função principal de processamento de email s forms
     def process_form_answers(self):
         num_msgs = 1
         while num_msgs > 0:
