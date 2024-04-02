@@ -42,6 +42,23 @@ class Database:
             cursor.close()
             conn.close()
 
+    def select_customers(self, cst_email):
+        log = logger.Logger()
+        conn, cursor = self.init_conn()
+        query = ("SELECT rd_ticket_id "
+                 "FROM implantacoes "
+                 "WHERE cst_email = %s "
+                 "AND status = %s")
+        try:
+            cursor.execute(query, (cst_email, 'pending'))
+            result = cursor.fetchone()
+            return result
+        except mysql.connector.Error as err:
+            log.error('db_error.log', err)
+        finally:
+            cursor.close()
+            conn.close()
+
     def insert_ticket(self, values):
         log = logger.Logger()
         conn, cursor = self.init_conn()
@@ -61,7 +78,7 @@ class Database:
         log = logger.Logger()
         conn, cursor = self.init_conn()
         query = ("UPDATE implantacoes "
-                 "SET status = 'finalizado' "
+                 "SET status = 'finished' "
                  "WHERE ticket_id = %s")
         try:
             cursor.execute(query, (ticket_id,))
