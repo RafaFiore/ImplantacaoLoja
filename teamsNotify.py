@@ -1,6 +1,7 @@
 import pymsteams
 import logger
 
+
 class TeamsNotifications:
     def __init__(self):
         #Prod
@@ -12,8 +13,8 @@ class TeamsNotifications:
 
     def send_notification(self, dominio, email, forms_url):
         try:
-            self.msteams_webhook.title(f'Notificações Implantação')
-            texto = (f"Não foi possível encontrar um ticket para o cliente abaixo.    \nDomínio: {dominio}    \nEmail: {email}    \nLink para respsota: {forms_url}")
+            self.msteams_webhook.title(f'Não foi possível encontrar um ticket para o cliente abaixo')
+            texto = (f"**Domínio:** {dominio}    \n**Email:** {email}    \n**Link para resposta:** [Resposta do forms]({forms_url})")
             self.msteams_webhook.text(texto)
             self.msteams_webhook.send()
         except pymsteams.TeamsWebhookException as err:

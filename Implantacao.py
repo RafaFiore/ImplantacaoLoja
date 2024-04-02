@@ -7,6 +7,7 @@ import logger
 import zenRequests
 from datetime import datetime
 from dateutil import parser
+import teamsNotify
 
 
 class Implantacao:
@@ -17,6 +18,7 @@ class Implantacao:
         self.db_conn = DB.Database()
         self.zenAPI = zenRequests.ZenAPI(self.brand)
         self.db_values = []
+        self.teams_notify = teamsNotify.TeamsNotifications()
 
     def get_form_content(self):
         form_response, num_msgs = self.email_obj.search_forms()
@@ -169,6 +171,7 @@ class Implantacao:
         num_msgs = 1
         while num_msgs > 0:
             form_answer, num_msgs = self.get_form_content()
+            dominio = form_answer[0]
             cst_email = form_answer[1]
             form_link = form_answer[2]
             ticket_exists = self.db_conn.select_customers(cst_email)
@@ -181,7 +184,8 @@ class Implantacao:
                 response = self.update_tickets(ticket_id, comment, status='open')
                 self.db_conn.update_ticket(ticket_id)
             else:
-                print('Ticket não encontrado com o email do cliente ou ticket já respondido')
+                print('Ticket não encontrado com o email do cliente')
+                self.teams_notify.send_notification(dominio, cst_email, form_link)
 
 
 if __name__ == "__main__":
