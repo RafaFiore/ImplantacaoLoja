@@ -105,7 +105,7 @@ class Implantacao:
         if rd_tickets:
             for i in rd_tickets:
                 rd_ticket_id = str(i['id'])
-                ticket_date = i['created_at']
+                rd_ticket_date = i['created_at']
                 subject = i['subject']
                 cst_email = subject.split('-')[1].strip()
                 cst_name = subject.split('-')[2].strip()
