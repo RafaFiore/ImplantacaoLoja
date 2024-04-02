@@ -165,6 +165,7 @@ class Implantacao:
                 self.add_db_values(ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, 'pending')
         else:
             print('Sem ticket')
+            exit()
         self.add_to_db(self.db_values)
 
     def process_form_answers(self):
