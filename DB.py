@@ -45,7 +45,7 @@ class Database:
     def select_customers(self, cst_email):
         log = logger.Logger()
         conn, cursor = self.init_conn()
-        query = ("SELECT rd_ticket_id "
+        query = ("SELECT ticket_id "
                  "FROM implantacoes "
                  "WHERE cst_email = %s "
                  "AND status = %s")
