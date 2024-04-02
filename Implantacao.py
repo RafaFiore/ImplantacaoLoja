@@ -1,3 +1,5 @@
+import time
+
 import EmailInfo
 from nested_lookup import nested_lookup
 import DB
@@ -80,32 +82,69 @@ class Implantacao:
         response = self.zenAPI.post_request(payload, self.zenAPI.create_tickets)
         return response
 
+    def update_tickets(self, ticket_id, comment, status):
+        url = self.zenAPI.new_urls[self.brand] + self.zenAPI.ticekts + ticket_id
+        submitter_id = 24966456979859  # TROCAR PARA PROD
+        payload = {
+            "ticket": {
+                "comment": {
+                    "body": f"{comment}",
+                    "public": "false"
+                },
+                "submitter_id": submitter_id,
+                "status": f"{status}"
+            }
+        }
+        response = self.zenAPI.put_request(payload, url)
+        return response
+
     def process_implantacao(self):
         log = logger.Logger()
         rd_tickets = self.search_rd_tickets()
         rd_lead_pattern = 'https://app.rdstation.com.br/leads/public/.*\\/s'
-        for i in rd_tickets:
-            rd_ticket_id = i['id']
-            ticket_date = i['created_at']
-            subject = i['subject']
-            cst_email = subject.split('-')[1].strip()
-            cst_name = subject.split('-')[2].strip()
-            rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
-            print(rd_lead_url)
-            print(cst_email)
-            ticket_created = self.check_tickets(rd_ticket_id)
-            if ticket_created:
-                print(f'Implantação já encaminhada: {rd_ticket_id}')
-                continue
-            else:
-                user_exists = self.check_zd_user(cst_email)
-                if user_exists:
-                    print(f'Usuário {cst_email} já existe, não é necessário criar')
+        if rd_tickets:
+            for i in rd_tickets:
+                rd_ticket_id = str(i['id'])
+                ticket_date = i['created_at']
+                subject = i['subject']
+                cst_email = subject.split('-')[1].strip()
+                cst_name = subject.split('-')[2].strip()
+                rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
+                print(rd_lead_url)
+                print(cst_email)
+                ticket_created = self.check_tickets(rd_ticket_id)
+                if ticket_created:
+                    print(f'Implantação já encaminhada: {rd_ticket_id}')
+                    continue
                 else:
-                    new_user = self.create_zd_user(cst_email, cst_name)
-                    log.info('debug.log', f'New Zendesk user created - {new_user["user"]["url"]}')
-            ticket = self.create_ticket(cst_email)
-            print(ticket)
+                    user_exists = self.check_zd_user(cst_email)
+                    if user_exists:
+                        print(f'Usuário {cst_email} já existe, não é necessário criar')
+                    else:
+                        new_user = self.create_zd_user(cst_email, cst_name)
+                        log.info('debug.log', f'New Zendesk user created - {new_user["user"]["url"]}')
+                ticket = self.create_ticket(cst_email)
+                ticket_id = str(ticket['ticket']['id'])
+                job_status_url = ticket['job_status']['url']
+                job_status_response = self.zenAPI.get_request(job_status_url, new_instance=True)
+                job_status = job_status_response['job_status']['status']
+                rd_comment = f'Ticket aberto com o cliente: {ticket_id}'
+                rd_ticket_response = self.update_tickets(rd_ticket_id, rd_comment, status='solved')
+                print(rd_ticket_response)
+                cst_comment = f"""
+                Ticket da RD: {rd_ticket_id}
+                Link para dados do cliente: {rd_lead_url}
+                """
+                if job_status == 'completed':
+                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    print(cst_ticket_response)
+                else:
+                    print('Aguardando criação do ticket')
+                    time.sleep(15)
+                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    print(cst_ticket_response)
+        else:
+            print('Sem ticket')
 
 
 if __name__ == "__main__":
