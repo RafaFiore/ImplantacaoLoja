@@ -231,6 +231,9 @@ class ZenAPI:
                 return self.put_request(payload, url)
             if request.status_code == 200:
                 return request.json()
+            else:
+                print(request.status_code)
+                print(request)
         except requests.exceptions.RequestException as err:
             log.error('error.log', f'Error: {request.status_code} - {err}')
 
