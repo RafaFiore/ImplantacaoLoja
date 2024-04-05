@@ -87,14 +87,28 @@ class Implantacao:
                 "is_public": "true",
                 "status": "pending",
                 "brand_id": brand_id,
-                "tags": ["dl_implantacao_abertura"]
+                "tags": ["dl_implantacao_abertura"],
+                "fields": [
+                    {
+                        "id": 26804463897363,
+                        "value": "dl_tipo_requisicao"
+                    },
+                    {
+                        "id": 26523845629459,
+                        "value": "dl_implantacao_e-commerce"
+                    },
+                    {
+                        "id": 26379258289811,
+                        "value": "dl_servicos"
+                    }
+                ]
             }
         }
         response = self.zenAPI.post_request(payload, self.zenAPI.create_tickets)
         return response
 
     # Atualizar tickets na Zendesk
-    def update_tickets(self, ticket_id, comment, status, ticket_type):
+    def update_tickets(self, ticket_id, comment, status, situacao_ticket):
         url = self.zenAPI.new_urls[self.brand] + self.zenAPI.ticekts + ticket_id
         print(url)
         submitter_id = 24966456979859  # TROCAR PARA PROD
@@ -108,8 +122,20 @@ class Implantacao:
                 "status": f"{status}",
                 "fields": [
                     {
-                        "id": 26097036675347,
-                        "value": "bloqueio_de_ip"
+                        "id": 26804463897363,
+                        "value": "dl_tipo_requisicao"
+                    },
+                    {
+                        "id": 26523845629459,
+                        "value": "dl_implantacao_e-commerce"
+                    },
+                    {
+                        "id": 26408042774163,
+                        "value": f"{situacao_ticket}"
+                    },
+                    {
+                        "id": 26379258289811,
+                        "value": "dl_servicos"
                     }
                 ]
             }
@@ -170,19 +196,22 @@ class Implantacao:
                 print(ticket_id)
                 rd_comment = f"""Ticket aberto com o cliente: {ticket_id}
                 """
-                rd_ticket_response = self.update_tickets(rd_ticket_id, rd_comment, status='solved')
+                rd_ticket_response = self.update_tickets(rd_ticket_id, rd_comment, status='solved',
+                                                         situacao_ticket='dl_atendido')
                 print(rd_ticket_response)
                 cst_comment = f"""Ticket da RD: {rd_ticket_id}
                 Link para dados do cliente: {rd_lead_url}
                 """
                 if job_status == 'completed':
-                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending',
+                                                              situacao_ticket='dl_aguardando_cliente')
                     ticket_date = datetime.now().replace(microsecond=0)
                     print(cst_ticket_response)
                 else:
                     print('Aguardando criação do ticket')
                     time.sleep(15)
-                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending')
+                    cst_ticket_response = self.update_tickets(ticket_id, cst_comment, status='pending',
+                                                              situacao_ticket='dl_aguardando_cliente')
                     ticket_date = datetime.now().replace(microsecond=0)
                     print(cst_ticket_response)
                 self.add_db_values(ticket_id, rd_ticket_id, cst_email, cst_name, rd_ticket_date, ticket_date, 'pending')
@@ -206,7 +235,7 @@ class Implantacao:
                 Prosseguir com implatanção.
                 Link para respostas do forms do cliente: {form_link} 
                 """
-                response = self.update_tickets(ticket_id, comment, status='open')
+                response = self.update_tickets(ticket_id, comment, status='open', situacao_ticket='dl_aguardando_consultor')
                 self.db_conn.update_ticket(ticket_id)
             else:
                 print('Ticket não encontrado com o email do cliente')
