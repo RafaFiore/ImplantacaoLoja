@@ -38,7 +38,7 @@ class EmailInfo:
 
     def mail_check(self, num, conn):
         res, msg = conn.fetch(str(num), '(RFC822)')
-        # self.delete_mail(str(num), conn)
+        self.delete_mail(str(num), conn)
         try:
             for response in msg:
                 if isinstance(response, tuple):
@@ -86,7 +86,7 @@ class EmailInfo:
                 for num in range(messages, messages - n, -1):
                     form_response_json = self.mail_check(num, conn)
                     num_msgs -= 1
-                # conn.expunge()
+                conn.expunge()
                 conn.close()
                 conn.logout()
                 return form_response_json, num_msgs
