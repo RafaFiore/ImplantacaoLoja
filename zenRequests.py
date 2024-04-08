@@ -70,6 +70,13 @@ class ZenAPI:
             "subdomain": f"{self.subdomains[self.brand]}"
         }
 
+        self.__prod_url = 'https://atendimentohgbrasil.zendesk.com/api/v2/'
+        self.__brands = {
+            "br": 23450142343187,
+            "es": 26367479199123,
+            "loja": 26355784046099
+        }
+
     @property
     def url(self):
         return self.__url
@@ -138,6 +145,14 @@ class ZenAPI:
     def ticekts(self):
         return self.__tickets
 
+    @property
+    def prod_url(self):
+        return self.__prod_url
+
+    @property
+    def brands(self):
+        return self.__brands
+
     def get_request(self, url, new_instance):
         log = logger.Logger
         if new_instance:
@@ -176,7 +191,7 @@ class ZenAPI:
             log.error('error.log', err)
 
     def post_request(self, payload, endpoint):
-        url = self.new_urls[self.brand] + endpoint
+        url = self.prod_url + endpoint
         log = logger.Logger()
         try:
             request = requests.post(url, auth=(self.__user + '/token', self.__new_token), headers=self.header,
