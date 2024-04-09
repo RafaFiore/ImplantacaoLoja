@@ -8,6 +8,7 @@ import zenRequests
 from datetime import datetime
 from dateutil import parser
 import teamsNotify
+import fire
 
 
 class Implantacao:
@@ -262,6 +263,4 @@ class Implantacao:
 
 
 if __name__ == "__main__":
-    implant = Implantacao('dloja')
-    # implant.process_implantacao()
-    implant.process_form_answers()
+    fire.Fire(Implantacao('dloja'))
