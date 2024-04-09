@@ -1,17 +1,3 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
-<a name="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
-
-
-
-
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -27,15 +13,9 @@
 <details>
   <summary>Sumário</summary>
   <ol>
-    <li>
-      <a href="#sobre-o-projeto">Sobre o Projeto</a>
-      <ul>
-        <li><a href="#linguagem">Linguagem</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#pré-requisitos">Pré-requisitos</a>
-    </li>
+    <li><a href="#sobre-o-projeto">Sobre o Projeto</a></li>
+    <li><a href="#linguagem">Linguagem</a></li>
+    <li><a href="#pré-requisitos">Pré-requisitos</a></li>
     <li><a href="#libs-do-python">Libs do Python</a></li>
     <li><a href="#utilização">Utilização</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
@@ -77,6 +57,8 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
 * pymsteams
 * python-dotenv
 * html-to-json
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Instalação
 **OBS:** Caso o servidor ou sua máquina local já tenha instalado o Python e MySQL, pular para o passo 4.
