@@ -28,24 +28,18 @@
   <summary>Sumário</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <a href="#sobre-o-projeto">Sobre o Projeto</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#linguagem">Linguagem</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
+      <a href="#pré-requisitos">Pré-requisitos</a>
     </li>
-    <li><a href="#usage">Usage</a></li>
+    <li><a href="#libs-do-python">Libs do Python</a></li>
+    <li><a href="#utilização">Utilização</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li><a href="#contatos">Contatos</a></li>
   </ol>
 </details>
 
@@ -87,11 +81,13 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
 ## Instalação
 **OBS:** Caso o servidor ou sua máquina local já tenha instalado o Python e MySQL, pular para o passo 4.
 
-1. Atualizar o ambiente
+1. **Atualizar o ambiente**
+
    ```sh
    yum update -y
    ```
-2. Instalar o MySQL
+2. **Instalar o MySQL**
+
    ```sh
    curl -sSLO https://dev.mysql.com/get/mysql80-community-release-el7-5.noarch.rpm
    ```
@@ -107,11 +103,13 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
    ```sh
    sudo mysql_secure_installation
    ```
-3. Instalar o Python 3
+3. **Instalar o Python 3**
+
    ```sh
    yum install -y python3
    ```
-4. Instalar as libs do Python
+4. **nstalar as libs do Python**
+
    ```sh
    pip install requests
    ```
@@ -130,7 +128,8 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
    ```sh
    pip install html-to-json
    ```
-5. Clonar o repo
+5. **Clonar o repo**
+
    ```sh
    git clone git@git.hostgator.com.br:especialistas/loja-implantacao.git
    ```
@@ -141,11 +140,13 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
 
 <!-- USAGE EXAMPLES -->
 ## Utilização
-* Função principal
+* **Função principal**
+
    ```sh
    python3 Implantacao.py proccess_implatancao
    ```
-* Função de processamento de respostas do forms
+* **Função de processamento de respostas do forms**
+
    ```sh
    python3 Implantacao.py process_form_answers
    ```
