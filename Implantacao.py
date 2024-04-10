@@ -29,7 +29,7 @@ class Implantacao:
 
     # Procurar no Zendesk os tickets em aberto da RD
     def search_rd_tickets(self):
-        query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Implanta%C3%A7%C3%A3o%20Ecommerce'
+        query = 'type%3Aticket%20requester%3Arafael.fiorentini%40newfold.com%20status%3Aopen%20status%3Anew%20Voc%C3%AA%20est%C3%A1%20sendo%20notificado%20sobre%20o%20est%C3%A1gio%20do%20Lead'
         url = self.zenAPI.prod_url + self.zenAPI.search + query
         response = self.zenAPI.get_request(url, new_instance=True)
         result = response['results']
@@ -183,6 +183,7 @@ class Implantacao:
                 rd_lead_url = re.findall(rd_lead_pattern, i['description'])[0]
                 print(rd_lead_url)
                 print(cst_email)
+                exit()
                 ticket_created = self.check_tickets(rd_ticket_id)
                 if ticket_created:
                     print(f'Implantação já encaminhada: {rd_ticket_id}')
