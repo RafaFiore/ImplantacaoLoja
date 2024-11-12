@@ -148,15 +148,15 @@ Assim que o cliente responde o formulário, a solicitação é redirecionado ao 
 <!-- CONTACT -->
 ## Contatos
 
-Rafael Fiorentini - rafael.fiorentini@newfold.com
+
 
 #### Suplentes
 
-Moises Junior - moises.junior@newfold.com
+
 
 #### Supervisão
 
-Larissa Vasconcelos - larissa.vasconcellos@newfold.com
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
